@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claudeだけで勤怠管理アプリを作った全手順 | 派遣AI</title>
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #0d0d0d;
+    color: #e8e8e8;
+    font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    padding: 40px 20px 80px;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .series-badge {
+    display: inline-block;
+    font-size: 12px;
+    color: #ff6b35;
+    border: 1px solid #ff6b35;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .price-badge {
+    display: inline-block;
+    background-color: #ff6b35;
+    color: #0d0d0d;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    color: #ffffff;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #aaaaaa;
+    margin-bottom: 16px;
+  }
+
+  .author {
+    font-size: 13px;
+    color: #777777;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #222222;
+  }
+
+  .future-box {
+    background-color: #111111;
+    border: 1px solid #ff6b35;
+    border-radius: 8px;
+    padding: 28px 28px 24px;
+    margin-bottom: 40px;
+  }
+
+  .future-box p {
+    margin-bottom: 12px;
+    font-size: 17px;
+    line-height: 1.9;
+  }
+
+  .future-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .demo-card {
+    display: block;
+    background-color: #1e1e1e;
+    border: 2px solid #ff6b35;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    text-decoration: none;
+    color: #ff6b35;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+  }
+
+  .demo-card:hover {
+    background-color: #282828;
+  }
+
+  .demo-card .demo-label {
+    font-size: 11px;
+    color: #888888;
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .demo-card .demo-url {
+    word-break: break-all;
+    font-size: 14px;
+  }
+
+  .warning-box {
+    background-color: #1a1212;
+    border-left: 4px solid #cc4444;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .warning-box .warning-title {
+    color: #cc4444;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .price-reason {
+    background-color: #141410;
+    border-left: 4px solid #ff6b35;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+    border-radius: 0 6px 6px 0;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 56px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff6b35;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #ff6b35;
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  ul, ol {
+    padding-left: 24px;
+    margin-bottom: 16px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    line-height: 1.8;
+  }
+
+  .check-list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .check-list li::before {
+    content: "✅ ";
+  }
+
+  .toc-box {
+    background-color: #111111;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+
+  .toc-box .toc-title {
+    font-size: 13px;
+    color: #888888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .toc-box ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+
+  .toc-box li {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .toc-box li::before {
+    content: "✅ ";
+  }
+
+  .prompt-block {
+    background-color: #1a1a1a;
+    border-left: 3px solid #ff6b35;
+    border-radius: 0 6px 6px 0;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+    font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #dddddd;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .magic-box {
+    background-color: #0f0f18;
+    border: 1px solid #444488;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 20px 0 24px;
+  }
+
+  .magic-box .magic-title {
+    color: #8888cc;
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+
+  .step-block {
+    background-color: #111111;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .step-block .step-label {
+    display: inline-block;
+    background-color: #ff6b35;
+    color: #0d0d0d;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .step-block p {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .step-block ul {
+    margin-bottom: 8px;
+  }
+
+  .step-block .caution {
+    color: #cc8844;
+    font-size: 14px;
+  }
+
+  .code-url {
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-family: "SFMono-Regular", "Consolas", monospace;
+    font-size: 13px;
+    color: #88ccff;
+    margin: 12px 0;
+    word-break: break-all;
+  }
+
+  .ng-ok-table {
+    margin: 24px 0;
+  }
+
+  .ng-ok-item {
+    background-color: #111111;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .ng-ok-item .pattern-label {
+    font-size: 13px;
+    color: #888888;
+    margin-bottom: 12px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+  }
+
+  .ng-line {
+    background-color: #1a0f0f;
+    border-left: 3px solid #cc4444;
+    padding: 10px 16px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #ff8888;
+  }
+
+  .ng-line .label {
+    font-weight: bold;
+    color: #cc4444;
+    margin-right: 6px;
+  }
+
+  .ok-line {
+    background-color: #0f1a0f;
+    border-left: 3px solid #44aa66;
+    padding: 10px 16px;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    color: #88dd99;
+  }
+
+  .ok-line .label {
+    font-weight: bold;
+    color: #44aa66;
+    margin-right: 6px;
+  }
+
+  .hint-box {
+    background-color: #101510;
+    border: 1px solid #336633;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .hint-box .hint-title {
+    color: #44aa66;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .closing-box {
+    background-color: #111111;
+    border-radius: 8px;
+    padding: 28px 28px 24px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .closing-box p {
+    margin-bottom: 14px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .closing-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .comment-box {
+    background-color: #0f1318;
+    border: 1px solid #335566;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-top: 32px;
+    margin-bottom: 40px;
+  }
+
+  .comment-box .comment-title {
+    color: #5599bb;
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+
+  .comment-box ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+
+  .comment-box li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #aaaaaa;
+  }
+
+  .comment-box li::before {
+    content: "・ ";
+    color: #5599bb;
+  }
+
+  .nav-bottom {
+    padding-top: 32px;
+    border-top: 1px solid #222222;
+    margin-top: 56px;
+  }
+
+  .nav-bottom a {
+    color: #888888;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .nav-bottom a:hover {
+    color: #ff6b35;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #222222;
+    margin: 48px 0;
+  }
+
+  .highlight {
+    color: #ff6b35;
+    font-weight: bold;
+  }
+
+  .important-notice {
+    background-color: #1a1510;
+    border: 1px solid #ff6b35;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .important-notice .notice-title {
+    color: #ff6b35;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-badge">このシリーズ ③ / ③（最終章）</div>
+
+  <div style="margin-bottom: 12px;">
+    <span class="price-badge">有料記事 ¥5,000</span>
+  </div>
+
+  <h1>Claudeだけで勤怠管理アプリを作った全手順</h1>
+  <p class="subtitle">コード0行・アラフィフ派遣社員が2晩で5年分の不満を解決</p>
+  <p class="author">著者：派遣AI｜AI時代を生き抜く事務職</p>
+
+  <div class="future-box">
+    <p>この記事を読み終えたとき、あなたの手元には<br>「あなたの不満を解消する、あなた専用のアプリ」があります。</p>
+    <p>コードは0行で構いません。<br>Claudeに「こうしたい」と伝えるだけです。</p>
+    <p>まずデモを触ってみてください。</p>
+    <a class="demo-card" href="https://nonengineer-ai.github.io/NewAPP/kintai-demo.html" target="_blank" rel="noopener">
+      <span class="demo-label">▶ デモはこちら</span>
+      <span class="demo-url">https://nonengineer-ai.github.io/NewAPP/kintai-demo.html</span>
+    </a>
+  </div>
+
+  <div class="warning-box">
+    <p class="warning-title">⚠️ 購入前に必ず読んでください</p>
+    <p>この記事で作るアプリは、<span class="highlight">Claude Proプラン（月額20ドル）だけで全部できます。</span>APIへの別課金は不要です。</p>
+  </div>
+
+  <div class="price-reason">
+    この手順書を読まずに自力で調べると、私のように<br>
+    書籍・Web講座に<span class="highlight">2万円以上かけてアウトプットゼロ</span>になります。<br>
+    その遠回りを2晩に圧縮するのが、この5,000円です。
+  </div>
+
+  <h2>なぜClaudeを選んだか</h2>
+
+  <p>ChatGPTやGeminiは作る手順は教えてくれる。でも自分で操作する必要がある。</p>
+  <p>Claudeは「作ってくれる」AIです。プログラミング知識ゼロでも作りたいデザインをその場で形にしてくれる。</p>
+  <p>最初は無料プランで始めたが、開発の途中で制限がかかった。続きは明日で、ができない作業だったのでそのままProプランに課金した。</p>
+
+  <h2>著者について</h2>
+
+  <p>事務系派遣社員として20年。プログラミングは未経験。</p>
+  <p>「AIに仕事を奪われるかも」という焦りから、この1年で書籍やWeb講座に<span class="highlight">2万円以上</span>を投じた。それでも、アウトプットはゼロ。何も残らなかった。</p>
+  <p>そんな私が、会社から帰宅後の<span class="highlight">2晩・約4時間</span>で自分専用の勤怠管理アプリを作った。</p>
+
+  <h2>5年間の不満</h2>
+
+  <ul>
+    <li>時給計算が自分の条件に合わない</li>
+    <li>有給の残日数がわからない</li>
+    <li>中抜け（離席）の時間を手計算しなければいけない</li>
+    <li>残業代が正確に出ない</li>
+  </ul>
+
+  <h2>この記事で身につくもの</h2>
+
+  <p>作れるのは「勤怠管理アプリ」だけじゃない。この記事で身につくのは<span class="highlight">「Claudeに作らせる伝え方」</span>です。</p>
+  <p>勤怠管理は私の例。読んだあなたが作るのは、あなたの不満を解消するアプリです。</p>
+
+  <h3>こんな人に読んでほしい</h3>
+  <ul>
+    <li>市販のアプリが自分の働き方に合わなくてずっと我慢している</li>
+    <li>「自分にはアプリなんて作れない」と思っている</li>
+    <li>でも、できることなら変えたい</li>
+  </ul>
+
+  <h3>こんな人には向かない</h3>
+  <ul>
+    <li>プログラミングをちゃんと勉強したい人</li>
+    <li>コードの仕組みを理解してから使いたい人</li>
+  </ul>
+
+  <div class="toc-box">
+    <p class="toc-title">この記事の内容</p>
+    <ul>
+      <li>Claudeへの「伝え方」のコツ（これさえわかれば、何でも作れる）</li>
+      <li>スマホでも開けるWebアプリにする全手順（GitHub Pages・スクショ付き・初回30分→次回30秒）</li>
+      <li>PCとスマホでデータを同期する方法（Googleスプレッドシート連携・コピペだけ）</li>
+      <li>すぐ使えるプロンプトテンプレート集（詰まったとき・バグが出たとき・機能追加したいとき）</li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+
+  <h2>第1章：Claudeへの伝え方──作業中に止まらないために</h2>
+
+  <p>Claude（生成AI）は「察する」ことができない。だから人間が具体的に書く必要がある。</p>
+
+  <h3>✅ これだけ覚えておけばOK</h3>
+
+  <p><strong>① 自分のことを書く</strong><br>
+  「プログラミングは一切できないノンエンジニアです」この一言を添えるだけで、Claudeが難しい用語を使わずに説明してくれる。</p>
+
+  <p><strong>② 何をしたいかを書く</strong><br>
+  「勤怠管理アプリを作りたい」ではなく「派遣社員の私が毎日使う勤怠管理アプリを作りたい」</p>
+
+  <p><strong>③ 条件を書く</strong><br>
+  「時給計算ができて、中抜け時間も入力できて、スマホでも使えるようにしたい」欲しい機能を箇条書きにするだけでOK。</p>
+
+  <div class="magic-box">
+    <p class="magic-title">🪄 作業中に使える魔法の2言</p>
+    <p><strong>「ノンエンジニアでもわかるように説明して」</strong><br>→ 専門用語が出てきて意味がわからないとき</p>
+    <p style="margin-bottom: 0;"><strong>「これ、難しいですか？」</strong><br>→ 複雑な改修をお願いするとき。難易度を教えてくれて、大抵はそのまま作ってくれる</p>
+  </div>
+
+  <hr class="divider">
+
+  <h2>第2章：作業中に制限がかかったら──ProとAPIの違い</h2>
+
+  <p>最初に安心してください。<span class="highlight">この記事の手順はProプランだけでOKです。</span></p>
+
+  <p><strong>Proプランとは：</strong>NetflixやSpotifyの月額サブスクと同じ。月額料金を払うとClaudeにいつでも話しかけられる。無料でも少しは使えるが、Proプランに入ると回数制限が大幅に緩和される。</p>
+
+  <div class="important-notice">
+    <p class="notice-title">💡 覚えておくこと</p>
+    <p style="margin-bottom: 0;">「セッション制限の90%を使用しました」と出ても、APIが必要になったわけではない。数時間待つとリセットされる。待てない場合は別のAI（GeminiやChatGPT）に同じ質問を投げる。</p>
+  </div>
+
+  <hr class="divider">
+
+  <h2>第3章：スマホで開けるようにする──GitHub Pages全手順</h2>
+
+  <p>PCで作ったファイルはそのPC（自分の引き出し）の中にしかない。スマホなど別の端末から見たいなら、インターネット上に公開する必要がある。</p>
+  <p>Claudeが提案してくれた解決策が<strong>GitHub Pages</strong>でした。無料でWebアプリを公開できるサービスです。</p>
+
+  <div class="hint-box">
+    <p class="hint-title">⚠️ 一番ハマったポイント</p>
+    <p style="margin-bottom: 0;">Branchの設定。「None」のままにしていたのが原因で、「main」に変えて保存したら3分後に表示された。</p>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 1</span>
+    <p><strong>リポジトリを作る（約3分）</strong></p>
+    <ul>
+      <li>右上の「＋」→「New repository」をタップ</li>
+      <li>Repository nameに好きな名前を入力（ASCII文字・数字・.-_のみ）</li>
+      <li>「Create repository」ボタンを押す</li>
+    </ul>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 2</span>
+    <p><strong>ファイルをアップロードする（約2分）</strong></p>
+    <ul>
+      <li>「Add file」→「Upload files」をタップ</li>
+      <li>HTMLファイルをドラッグアンドドロップ</li>
+      <li>「Commit changes」ボタンを押す</li>
+    </ul>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 3</span>
+    <p><strong>GitHub Pagesを有効にする（約5分）</strong></p>
+    <ul>
+      <li>リポジトリのページ上部「Settings」をタップ</li>
+      <li>左メニュー「Pages」をタップ</li>
+      <li>⚠️「Branch」のところで「<strong>main</strong>」を選んで「Save」を押す</li>
+    </ul>
+    <p class="caution">⚠️「None」のままにしていると、いつまで待ってもURLが表示されない</p>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 4</span>
+    <p><strong>URLを確認する（約2分）</strong></p>
+    <div class="code-url">https://あなたのユーザー名.github.io/フォルダ名/作成したアプリ名.html</div>
+    <p class="caution">⚠️ Saveを押してからURLが有効になるまで3分ほどかかります。</p>
+  </div>
+
+  <p>合計約12分。<span class="highlight">2回目以降はSTEP2だけで終わります。初回30分が次から30秒になります。</span></p>
+
+  <hr class="divider">
+
+  <h2>第4章：作って終わりじゃない、使いながら育てる</h2>
+
+  <p>アプリが完成してから毎日使い続けた。使っていると「ここがこうだったら」が出てくる。それがそのまま次のプロンプトになった。</p>
+
+  <h3>① スマホ入力をもっと便利にした</h3>
+  <div class="prompt-block">「スマホで開くと、一覧表の代わりに日付カードリストに自動で切り替わるようにしたい。タップするとポップアップが開いて入力できるようにしたい。難しいですか？」</div>
+  <p>→ すぐに完成した</p>
+
+  <h3>② 残業代が割増されていないことに気づいた</h3>
+  <p>使い始めてしばらくして「この推定給与、ちゃんと残業代が割増になってる？」確認したら、残業時間も所定時間内と同じ時給で計算されていた。</p>
+  <div class="prompt-block">「確認です。総勤務時間と推定給与はどう計算していますか？残業割増あり25%で計算して。」</div>
+  <p>→ 修正完了。<span class="highlight">作ったら必ず自分でテストすること。</span></p>
+
+  <h3>③ Claude上でスマホプレビューを確認する方法</h3>
+  <p>「スマホでプレビュー見せて」と聞くだけ。チャット内にスマホ画面が出てきた。</p>
+
+  <h3>④ 保存が遅い問題を修正した</h3>
+  <div class="prompt-block">「勤怠を入力して反映されるまでの反応に時間がかかる。何かに問題がある？」</div>
+  <p>Claudeはすぐに原因を見つけて直してくれた。</p>
+  <div class="hint-box">
+    <p class="hint-title">💡 Claudeの例え</p>
+    <p><strong>修正前：</strong>注文したら料理が完成するまでメニューすら見られない</p>
+    <p style="margin-bottom: 0;"><strong>修正後：</strong>注文したらすぐテーブルに案内・メニューも見られる → 料理は裏で完成したらお知らせ</p>
+  </div>
+
+  <hr class="divider">
+
+  <h2>第5章：PCとスマホのデータを同期する──Googleスプレッドシート連携全手順</h2>
+
+  <p>GitHub Pagesで公開したが、PCとスマホでデータが別々だと気づいた。</p>
+  <p>「PCとスマホのブラウザは、同じChromeを使っていてもデータの保存場所が別々になっています」→ クラウド保存が必要。</p>
+
+  <div class="warning-box">
+    <p class="warning-title">⚠️ 重要：セキュリティについて</p>
+    <p>この章ではGoogleスプレッドシートに「WebアプリのURL」が発行されます。このURLは個人情報に紐づくものです。<span class="highlight">Claudeのチャットに貼らないでください。</span></p>
+  </div>
+
+  <p><strong>大まかな流れ（4ステップ）</strong></p>
+
+  <div class="step-block">
+    <span class="step-label">STEP 1</span>
+    <p><strong>Googleスプレッドシートを新規作成する（約2分）</strong></p>
+    <ul>
+      <li>Googleドライブで新規作成 → スプレッドシート</li>
+      <li>「＋」で新しいシートを作り「kintai」と入力</li>
+    </ul>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 2</span>
+    <p><strong>Google Apps Script（GAS）を設定する（約10分）</strong></p>
+    <ul>
+      <li>スプレッドシートの上メニュー「拡張機能」→「Apps Script」</li>
+      <li>すでに書いてあるコードを全部消す</li>
+      <li>Claudeに「このアプリ用のGASコードを作って」とHTMLファイルを渡してお願いする</li>
+      <li>「デプロイ」→「新しいデプロイ」→ 設定：アクセスできるユーザー「全員」→「デプロイ」</li>
+      <li>「ウェブアプリのURL」が表示される</li>
+    </ul>
+    <p class="caution">⚠️ このURLは絶対にClaudeのチャットに貼らない</p>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 3</span>
+    <p><strong>発行されたURLをアプリに組み込む（約5分）</strong></p>
+    <ul>
+      <li>Claudeのチャットを新しく開き直す</li>
+      <li>HTMLファイルを添付して「GASのURLは直接チャットには貼れないので『GAS_URL』という仮の文字列で書いてもらえますか？」</li>
+      <li>ダウンロードしたHTMLファイルをテキストエディタで開き、GAS_URLの部分を実際のURLに書き換えて保存</li>
+    </ul>
+  </div>
+
+  <div class="step-block">
+    <span class="step-label">STEP 4</span>
+    <p><strong>GitHubに上書きアップロード（約3分）</strong></p>
+    <ul>
+      <li>第3章のSTEP2と同じ手順でファイルをアップロード</li>
+      <li>同じファイル名でアップロードすれば自動的に上書きされる</li>
+      <li>3分ほど待ってからスマホで確認</li>
+    </ul>
+  </div>
+
+  <p>合計約20分。<span class="highlight">これでPCでもスマホでも、どちらで入力してもデータが同期されます。</span></p>
+
+  <hr class="divider">
+
+  <h2>特典：すぐ使えるプロンプトテンプレート集</h2>
+
+  <p>「読むもの」ではなく「使うもの」です。詰まったとき、ここに戻ってきてください。</p>
+
+  <h3>【NG/OKパターン5選】</h3>
+
+  <div class="ng-ok-table">
+
+    <div class="ng-ok-item">
+      <p class="pattern-label">パターン① ： アプリを作りたい時</p>
+      <div class="ng-line"><span class="label">❌</span>「勤怠アプリを作って」→ ありきたりなアプリができて、自分の働き方に合わない</div>
+      <div class="ok-line"><span class="label">⭕</span>「ノンエンジニアの派遣社員の私の勤怠管理アプリを開発したい。時給制で中抜けがあり、残業も1分単位で計算したい」</div>
+    </div>
+
+    <div class="ng-ok-item">
+      <p class="pattern-label">パターン② ： バグが出た時</p>
+      <div class="ng-line"><span class="label">❌</span>「動かない」</div>
+      <div class="ok-line"><span class="label">⭕</span>「保存ボタンを押したら画面が真っ白になる。やりたかったのは入力データの保存」</div>
+    </div>
+
+    <div class="ng-ok-item">
+      <p class="pattern-label">パターン③ ： 機能を追加したい時</p>
+      <div class="ng-line"><span class="label">❌</span>「有給機能つけて」</div>
+      <div class="ok-line"><span class="label">⭕</span>「派遣会社のアプリは月初1日時点の残日数しか見えない。リアルタイムで残日数が見たい」</div>
+    </div>
+
+    <div class="ng-ok-item">
+      <p class="pattern-label">パターン④ ： 画面の見た目を直したい時</p>
+      <div class="ng-line"><span class="label">❌</span>「見づらいから直して」</div>
+      <div class="ok-line"><span class="label">⭕</span>「スマホの縦画面で終了時間を入力する時、横スクロールしないと届かない」</div>
+    </div>
+
+    <div class="ng-ok-item">
+      <p class="pattern-label">パターン⑤ ： 難しそうな時</p>
+      <div class="ng-line"><span class="label">❌</span>「これ無理かな」</div>
+      <div class="ok-line"><span class="label">⭕</span>「複雑な改修になりそうですが、難しいですか？」</div>
+    </div>
+
+  </div>
+
+  <div class="hint-box">
+    <p class="hint-title">共通点まとめ</p>
+    <p><strong>NGの共通点：</strong>主語がない／具体的な操作がない／自分の状況が抜けている</p>
+    <p style="margin-bottom: 0;"><strong>OKの共通点：</strong>「自分は何者で」「何の場面で」「何が起きていて」「何が欲しいか」</p>
+  </div>
+
+  <h3>【コピペで使えるプロンプト集】</h3>
+
+  <p><strong>アプリの基本を作る</strong></p>
+  <div class="prompt-block">＃やりたいこと
+ノンエンジニアの派遣社員の私の勤怠管理アプリを開発したい
+＃条件
+勤務時間(開始終了)を入力すると時給計算をしてくれる
+有給も入れられる
+残業時間の見える化
+勤務時間はスクロールではなく、直接時間を入力するようにしたい
+残業時間は1分単位で</div>
+
+  <p><strong>バグが出た時</strong></p>
+  <div class="prompt-block">以下の問題が発生しています。
+【症状】〇〇をしたら〇〇になった
+【やりたかったこと】〇〇したかった
+【試したこと】〇〇をしてみたが解決しなかった</div>
+
+  <hr class="divider">
+
+  <h2>最後に</h2>
+
+  <div class="closing-box">
+    <p>11日間、何度も書き直しながらこの記事を作りました。「同じ立場の人が同じ壁にぶつからないように」という気持ちだけで書き続けました。</p>
+    <p>ここまで読んで気づいた方もいると思います。どれも難しい言葉を一切使っていません。</p>
+    <p>「実装してください」でも「関数を追加してください」でもない。</p>
+    <p>「こうしたい」「これが面倒だった」「こうなったら嬉しい」</p>
+    <p style="margin-bottom: 0;">自分の言葉で書けば、Claudeには伝わります。</p>
+  </div>
+
+  <div class="comment-box">
+    <p class="comment-title">📩 詰まったことがあれば、いつでもコメントください</p>
+    <ul>
+      <li>Claudeへの伝え方がわからない</li>
+      <li>GitHubのところでつまずいた</li>
+      <li>スプレッドシート連携でエラーが出た</li>
+    </ul>
+    <p style="margin-top: 12px; font-size: 14px; color: #aaaaaa;">一人で抱え込まないでください。</p>
+  </div>
+
+  <div class="nav-bottom">
+    <a href="article-02-python.html">← 前の記事へ</a>
+  </div>
+
+</div>
+</body>
+</html>

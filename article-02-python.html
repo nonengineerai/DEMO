@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pythonも勉強ゼロで、1時間のExcel作業を5分にした全手順｜派遣AI</title>
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #0d0d0d;
+    color: #e8e8e8;
+    font-family: "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    font-size: 17px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  .series-badge {
+    display: inline-block;
+    font-size: 12px;
+    color: #4cc9f0;
+    border: 1px solid #4cc9f0;
+    border-radius: 4px;
+    padding: 3px 10px;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .paid-badge {
+    display: inline-block;
+    font-size: 11px;
+    background-color: #4cc9f0;
+    color: #0d0d0d;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  .price-label {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #4cc9f0;
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    color: #f0f0f0;
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: #999;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .author-line {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #222;
+  }
+
+  .author-line span {
+    color: #4cc9f0;
+  }
+
+  .lead-box {
+    background-color: #111;
+    border-left: 3px solid #4cc9f0;
+    border-radius: 4px;
+    padding: 28px 30px;
+    margin-bottom: 52px;
+    font-size: 16.5px;
+    line-height: 2;
+    color: #d8d8d8;
+  }
+
+  .lead-box .lead-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4cc9f0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .lead-box .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+
+  .lead-box .checklist li {
+    padding: 5px 0;
+    font-size: 16.5px;
+    color: #e8e8e8;
+  }
+
+  .lead-box .checklist li::before {
+    content: "✅ ";
+  }
+
+  .lead-box .note {
+    font-size: 15.5px;
+    color: #b0b0b0;
+    margin-top: 18px;
+    line-height: 1.85;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f0f0f0;
+    margin-top: 60px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #222;
+    letter-spacing: 0.02em;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #e8e8e8;
+    margin-top: 32px;
+    margin-bottom: 14px;
+  }
+
+  p {
+    margin-bottom: 22px;
+    color: #d8d8d8;
+  }
+
+  .target-list {
+    background-color: #111;
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin: 28px 0;
+  }
+
+  .target-list .list-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4cc9f0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .target-list ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .target-list ul li {
+    padding: 6px 0;
+    font-size: 15.5px;
+    color: #d0d0d0;
+  }
+
+  .target-list ul.check li::before {
+    content: "✓ ";
+    color: #4cc9f0;
+    font-weight: 700;
+  }
+
+  .target-list ul.cross li::before {
+    content: "✗ ";
+    color: #888;
+    font-weight: 700;
+  }
+
+  .story-block {
+    background-color: #111;
+    border-radius: 6px;
+    padding: 26px 28px;
+    margin: 28px 0;
+    font-size: 16px;
+    color: #ccc;
+    line-height: 1.95;
+    font-style: italic;
+  }
+
+  .story-block p {
+    color: #ccc;
+    margin-bottom: 14px;
+  }
+
+  .story-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-quote {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0f0f0;
+    border-left: 3px solid #4cc9f0;
+    padding: 4px 0 4px 18px;
+    margin: 32px 0;
+    line-height: 1.6;
+  }
+
+  .template-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4cc9f0;
+    background-color: rgba(76, 201, 240, 0.1);
+    border-radius: 3px;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+  }
+
+  .code-block {
+    background-color: #1a1a1a;
+    border-left: 3px solid #4cc9f0;
+    border-radius: 4px;
+    padding: 24px 26px;
+    margin: 24px 0;
+    font-size: 14px;
+    line-height: 1.85;
+    color: #c8c8c8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+    overflow-x: auto;
+  }
+
+  .step-block {
+    background-color: #111;
+    border-radius: 6px;
+    padding: 28px 28px;
+    margin: 28px 0;
+  }
+
+  .step-block .step-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #4cc9f0;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-block .step-title .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: #4cc9f0;
+    color: #0d0d0d;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .step-block ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .step-block ul li {
+    padding: 5px 0;
+    font-size: 15.5px;
+    color: #d0d0d0;
+    line-height: 1.75;
+  }
+
+  .step-block ul li::before {
+    content: "・";
+    color: #4cc9f0;
+  }
+
+  .warning-inline {
+    color: #f4a261;
+    font-weight: 700;
+  }
+
+  .warn-box {
+    background-color: rgba(244, 162, 97, 0.07);
+    border-left: 3px solid #f4a261;
+    border-radius: 4px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 15px;
+    color: #d8d8d8;
+    line-height: 1.8;
+  }
+
+  .warn-box strong {
+    color: #f4a261;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+
+  .tip-inline {
+    color: #4cc9f0;
+    font-weight: 700;
+  }
+
+  .error-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  .error-list li {
+    background-color: #111;
+    border-radius: 5px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #d0d0d0;
+    line-height: 1.75;
+  }
+
+  .error-list li .err-label {
+    font-size: 13px;
+    font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+    color: #f4a261;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .error-list li .err-fix {
+    color: #4cc9f0;
+    font-weight: 700;
+  }
+
+  .github-warn-box {
+    background-color: rgba(76, 201, 240, 0.05);
+    border: 1px solid rgba(76, 201, 240, 0.2);
+    border-radius: 6px;
+    padding: 22px 26px;
+    margin: 28px 0;
+    font-size: 15px;
+    color: #d8d8d8;
+    line-height: 1.85;
+  }
+
+  .github-warn-box strong {
+    color: #4cc9f0;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .github-warn-box ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+
+  .github-warn-box ul li {
+    padding: 4px 0;
+    color: #c8c8c8;
+  }
+
+  .github-warn-box ul li::before {
+    content: "⚠️ ";
+  }
+
+  .step-list {
+    counter-reset: step-counter;
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+  }
+
+  .step-list li {
+    counter-increment: step-counter;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: #d8d8d8;
+  }
+
+  .step-list li::before {
+    content: counter(step-counter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    background-color: #4cc9f0;
+    color: #0d0d0d;
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 50%;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .next-section {
+    background: linear-gradient(135deg, #111 0%, #141414 100%);
+    border: 1px solid #222;
+    border-top: 3px solid #4cc9f0;
+    border-radius: 8px;
+    padding: 36px 32px;
+    margin-top: 64px;
+  }
+
+  .next-section .next-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4cc9f0;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .next-section h3 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #f0f0f0;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    margin-top: 0;
+  }
+
+  .next-section p {
+    font-size: 15px;
+    color: #aaa;
+    margin-bottom: 28px;
+    line-height: 1.8;
+  }
+
+  .btn-next {
+    display: inline-block;
+    background-color: #4cc9f0;
+    color: #0d0d0d;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 6px;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .btn-next:hover {
+    background-color: #38b6de;
+    transform: translateY(-1px);
+  }
+
+  .prev-link {
+    display: block;
+    margin-top: 20px;
+    font-size: 13.5px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .prev-link:hover {
+    color: #4cc9f0;
+  }
+
+  .prev-link::before {
+    content: "← ";
+  }
+
+  .meta-footer {
+    margin-top: 60px;
+    padding-top: 32px;
+    border-top: 1px solid #1e1e1e;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .meta-footer span {
+    color: #4cc9f0;
+  }
+
+  @media (max-width: 540px) {
+    h1 {
+      font-size: 21px;
+    }
+    .container {
+      padding: 40px 18px 80px;
+    }
+    .code-block {
+      font-size: 12.5px;
+    }
+    .next-section {
+      padding: 28px 22px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div>
+    <div class="series-badge">このシリーズ ② / ③</div>
+    <span class="paid-badge">有料記事 ¥500</span>
+  </div>
+
+  <div style="margin-top: 6px; margin-bottom: 28px;">
+    <span class="price-label">¥500</span>
+  </div>
+
+  <h1>Pythonも勉強ゼロで、1時間のExcel作業を5分にした全手順</h1>
+  <div class="subtitle">VBAがある人もない人も。ダブルクリックだけで動くまで全部書きます。</div>
+
+  <div class="author-line">
+    <span>派遣AI｜AI時代を生き抜く事務職</span>　2024年
+  </div>
+
+  <div class="lead-box">
+    <div class="lead-title">📦 この記事を読み終えたとき、あなたの手元には</div>
+    <ul class="checklist">
+      <li>毎月の面倒なデータ加工を自動化するPythonコード</li>
+      <li>ダブルクリックだけで動くbatファイル</li>
+      <li>職場の誰でも使える手順書（README）</li>
+    </ul>
+    <div class="note">
+      この3つが揃っています。<br>
+      コードを理解する必要はありません。Pythonを勉強する必要もありません。<br>
+      私がそうなので、断言できます。
+    </div>
+  </div>
+
+  <h2>🙋 この記事が刺さる人</h2>
+
+  <div class="target-list">
+    <div class="list-label">向いている人</div>
+    <ul class="check">
+      <li>毎月同じExcel作業を何時間もかけてやっている</li>
+      <li>ExcelマクロやVBAを使っている（持っていない人もOK）</li>
+      <li>プログラミング学習で何度も挫折した</li>
+    </ul>
+  </div>
+
+  <div class="target-list" style="margin-top: -8px;">
+    <div class="list-label">向かない人</div>
+    <ul class="cross">
+      <li>Pythonをちゃんと勉強したい人</li>
+      <li>コードの仕組みを理解してから使いたい人</li>
+    </ul>
+  </div>
+
+  <h2>💬 なぜPythonを使うことになったのか</h2>
+
+  <div class="story-block">
+    <p>職場のエンジニアに言われた。「Excelマクロは止めて、Python使いません？」</p>
+    <p>「えーーー、無理！！！」</p>
+    <p>Pythonって、エンジニアが使うやつでしょ。私には関係ない話だと思っていた。</p>
+    <p>でも違った。勉強はゼロでよかった。VBAコードをChatGPTに渡してPythonに変換してもらっただけ。コードの意味は1ミリもわからない。でも動いた。</p>
+  </div>
+
+  <h2>🔧 準備：Pythonのインストール（約10分）</h2>
+
+  <p>まず1回だけ、パソコンにPythonを入れます。入れてしまえばあとは何度でも使えます。</p>
+
+  <ol class="step-list">
+    <li><a href="https://www.python.org/downloads/" style="color: #4cc9f0;">https://www.python.org/downloads/</a> にアクセスする</li>
+    <li>一番上の安定版をクリック（ページ中央の大きな黄色ボタンは押さない）</li>
+    <li>インストーラーが開いたら <span class="warning-inline">⚠️「Add Python to PATH」に必ずチェック</span> を入れてから「Install Now」を押す</li>
+    <li>インストール確認：Windowsキー+R → 「cmd」と入力してEnter → <code style="background:#1a1a1a; padding:2px 6px; border-radius:3px; font-family:monospace; color:#c8c8c8;">python --version</code> と入力してEnter</li>
+  </ol>
+
+  <div class="warn-box">
+    <strong>⚠️ 重要：PATHのチェックを忘れると</strong>
+    「Add Python to PATH」にチェックを入れ忘れると、batファイルをダブルクリックしても黒い画面が一瞬出て消えるだけになります。そうなったらPythonをアンインストールして入れ直すのが一番早いです。
+  </div>
+
+  <h3>openpyxlの追加インストール</h3>
+
+  <p>Pythonのインストールが終わったら、ExcelファイルをPythonで読み書きするためのパッケージを追加します。コマンドプロンプトに以下を貼り付けてEnter。</p>
+
+  <div class="code-block">pip install openpyxl</div>
+
+  <p>「Successfully installed openpyxl-3.1.5」のような表示が出ればOKです。</p>
+
+  <h2>第1章：VBAコードをそのまま渡すだけ。全プロンプト公開</h2>
+
+  <p>ChatGPTに渡したのは2つだけ。自分で作っていた引き継ぎ書（Excel）と、VBAコードです。</p>
+
+  <div class="highlight-quote">
+    難しいことは何もしていない。持っているものをそのまま渡しただけ。
+  </div>
+
+  <h3>🔑 VBAコードがある人向け</h3>
+
+  <div class="template-label">プロンプトテンプレート ①-A</div>
+  <div class="code-block">以下の2つを添付します。
+・手順書（①〇〇 ②〇〇 というシート名）
+・VBAコード
+中身を確認してPythonコードを作ってください。
+不明点があれば先に質問してください。</div>
+
+  <p>ポイントは最後の一言「<span class="tip-inline">不明点があれば先に質問してください</span>」。これを入れると、的外れなコードを作られて「なんか違う」を繰り返す無駄がなくなります。</p>
+
+  <h3>🔑 VBAコードがない人向け</h3>
+
+  <div class="template-label">プロンプトテンプレート ①-B</div>
+  <div class="code-block">私はExcelで毎月こういう作業を手作業でやっています。
+この作業を自動化するPythonコードを作ってください。
+
+■ 使っているファイル
+・（例：アンケート結果のExcel。列はA〜Eで…）
+
+■ やりたい処理（1ステップずつ）
+1.
+2.
+3.
+
+■ 私のスキル
+・Excelは使えるがプログラミングは未経験
+不明点があれば先に質問してください。</div>
+
+  <p>VBAがなくても大丈夫です。やっている作業を1ステップずつ書くだけで、ChatGPTが必要な情報を質問してくれます。</p>
+
+  <h2>第2章：もらったコードを動かす（ダブルクリックで完結）</h2>
+
+  <div class="step-block">
+    <div class="step-title">
+      <span class="step-num">1</span>
+      Pythonコードをメモ帳に保存する
+    </div>
+    <ul>
+      <li>ChatGPTのコードは「📄」ボタンでコピーする（マウスで範囲選択すると崩れることがある）</li>
+      <li>メモ帳を開いて貼り付ける</li>
+      <li>「名前をつけて保存」を選ぶ</li>
+      <li><span class="warning-inline">「ファイルの種類」を必ず「すべてのファイル」に変更する</span></li>
+      <li><span class="warning-inline">ファイル名：data_processing.py（.txtにならないよう注意）</span></li>
+      <li><span class="warning-inline">文字コード：UTF-8 を確認する</span></li>
+    </ul>
+  </div>
+
+  <div class="step-block">
+    <div class="step-title">
+      <span class="step-num">2</span>
+      batファイルを作る
+    </div>
+    <ul>
+      <li>メモ帳を新規で開く</li>
+      <li>以下のコードを貼り付ける</li>
+    </ul>
+    <div class="code-block">@echo off
+cd %~dp0
+python data_processing.py
+pause</div>
+    <ul>
+      <li>ファイル名：<code style="background:#1a1a1a; padding:2px 6px; border-radius:3px; font-family:monospace; color:#c8c8c8;">run.bat</code>（ファイルの種類：すべてのファイル）</li>
+      <li>data_processing.py と同じフォルダに保存する</li>
+    </ul>
+  </div>
+
+  <p>batファイルもChatGPTに作ってもらえます。</p>
+
+  <div class="template-label">プロンプトテンプレート ②</div>
+  <div class="code-block">作ってもらったPythonコードを
+ダブルクリックだけで実行できるように
+batファイルも作ってください。</div>
+
+  <div class="step-block">
+    <div class="step-title">
+      <span class="step-num">3</span>
+      ダブルクリックで動かす
+    </div>
+    <ul>
+      <li>処理対象のExcelファイルを data_processing.py と同じフォルダに入れる</li>
+      <li>run.bat をダブルクリックする</li>
+      <li>「完了しました」と表示されれば成功</li>
+    </ul>
+  </div>
+
+  <h3>よくあるエラーと対処</h3>
+
+  <ul class="error-list">
+    <li>
+      <span class="err-label">「data.xlsxが見つかりません」</span>
+      <span class="err-fix">→</span> ExcelファイルをPythonファイルと同じフォルダに入れているか確認する
+    </li>
+    <li>
+      <span class="err-label">黒い画面が一瞬出て消えた</span>
+      <span class="err-fix">→</span> PATHのチェックが入っていない可能性が高い。Pythonをアンインストールして入れ直す
+    </li>
+    <li>
+      <span class="err-label">「ModuleNotFoundError: No module named ○○」</span>
+      <span class="err-fix">→</span> コマンドプロンプトで <code style="background:#0d0d0d; padding:2px 6px; border-radius:3px; font-family:monospace; color:#c8c8c8;">pip install ○○</code> を実行する
+    </li>
+  </ul>
+
+  <h2>第3章：GitHubへの上げ方（コピペするだけの早見表）</h2>
+
+  <div class="github-warn-box">
+    <strong>⚠️ GitHubは「必須」ではありません</strong>
+    第2章までで自動化は完成しています。GitHubは「別PCでも使いたい」「職場に配りたい」「バックアップを取りたい」ときだけ使います。
+  </div>
+
+  <h3>会社で使う場合の3つの確認</h3>
+
+  <div class="target-list">
+    <ul class="check">
+      <li>会社が外部サービスへのコード保存を許可しているか</li>
+      <li>リポジトリは必ず「Private（非公開）」にする</li>
+      <li>取引先名・個人情報はコードや手順書に書かない</li>
+    </ul>
+  </div>
+
+  <h3>コピペ用：GitHubに上げるときの呪文4ステップ</h3>
+
+  <div class="code-block">【①フォルダに移動する】
+cd C:\Users\あなたのユーザー名\Desktop\my_project
+
+【②変更したファイルを準備する】
+git add .
+
+【③変更内容を保存する】
+git commit -m "更新"
+
+【④GitHubにアップロードする】
+git push</div>
+
+  <p>この4ステップをそのままメモ帳に保存しておくと、毎回コピペするだけで済みます。</p>
+
+  <p>この早見表もChatGPTに作ってもらえます。</p>
+
+  <div class="template-label">プロンプトテンプレート ③</div>
+  <div class="code-block">GitHubにコードを上げるときに必要な呪文を
+毎回コピペするだけで使えるように
+最初のフォルダ指定から全部含めて
+早見表にまとめてください。
+リポジトリはPrivate（非公開）で作る前提でお願いします。</div>
+
+  <h2>第4章：職場の誰でも使える手順書の作り方</h2>
+
+  <p>コードを作ったら、一緒に手順書も作ってもらいましょう。「後任者が来たとき」「しばらく使わなくて忘れたとき」に役立ちます。</p>
+
+  <div class="template-label">プロンプトテンプレート ④</div>
+  <div class="code-block">ノンエンジニアでもわかりやすい手順書を
+GitHubに登録するmdファイルを作ってください。</div>
+
+  <div class="warn-box">
+    <strong>💡 形式を指定するのがポイント</strong>
+    「ノンエンジニアでもわかりやすい手順書を作って」だけだとカラフルで絵文字まみれのものが返ってきます。「mdファイルを作って」と形式を指定するとシンプルなものができます。
+  </div>
+
+  <h2>🏁 最後に</h2>
+
+  <p>ぶっちゃけ、いまだにPythonもGitHubの仕組みも人にわかりやすく説明できません。</p>
+
+  <p>でも仕事を楽にすることは、今すぐできます。</p>
+
+  <div class="highlight-quote">
+    まずは今やっている面倒な作業を1つ、ChatGPTに説明してみてください。
+  </div>
+
+  <p>コードを理解しなくていい。勉強しなくていい。動けばいい。それだけです。</p>
+
+  <div class="next-section">
+    <div class="next-label">次のステップ</div>
+    <h3>Pythonで自動化できた人なら、アプリも作れます。私がそうでした。</h3>
+    <p>ただし次のステップはもう少し複雑で、2晩でできた全手順を5,000円でまとめています。「自分専用のアプリを作れたら」と感じたら、こちらへどうぞ。</p>
+    <a href="article-03-claude-app.html" class="btn-next">次の記事へ →</a>
+    <a href="article-01-chatgpt.html" class="prev-link">前の記事：①ChatGPT書き出し入門</a>
+  </div>
+
+  <div class="meta-footer">
+    <span>派遣AI｜AI時代を生き抜く事務職</span><br>
+    このシリーズ ② / ③　｜　有料記事 ¥500
+  </div>
+
+</div>
+</body>
+</html>
